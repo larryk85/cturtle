@@ -37,4 +37,4 @@ namespace bluegrass::feller {
 
 } // ns bluegrass::feller
 
-#define BLUEGRASS_ERROR(NAME) constexpr static inline error NAME = {#NAME, __COUNTER__};
+#define BLUEGRASS_ERROR(NAME) constexpr static inline bluegrass::feller::error NAME = {#NAME, __COUNTER__};

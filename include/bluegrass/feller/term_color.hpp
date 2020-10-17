@@ -13,6 +13,7 @@
 #include <cstring>
 #include <iostream>
 #include <string_view>
+#include <sstream>
 
 namespace bluegrass::feller::color {
 
