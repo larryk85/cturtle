@@ -3,7 +3,7 @@ set(VERSION_MAJOR 1)
 set(VERSION_MINOR 0)
 set(VERSION_PATCH 0)
 set(VERSION_SUFFIX rc1)
-project(feller VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
+project(cturtle VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
 if (VERSION_SUFFIX)
    set(VERSION_FULL "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-${VERSION_SUFFIX}")
@@ -26,10 +26,10 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/modules")
 
 add_subdirectory(external)
 
-add_library(feller INTERFACE)
-target_include_directories(feller INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-add_library(bluegrass::feller ALIAS feller)
-target_link_libraries(feller INTERFACE fmt::fmt-header-only)
+add_library(cturtle INTERFACE)
+target_include_directories(cturtle INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+add_library(bluegrass::cturtle ALIAS cturtle)
+target_link_libraries(cturtle INTERFACE fmt::fmt-header-only)
 
 if(ENABLE_TESTS)
    include(CTest)

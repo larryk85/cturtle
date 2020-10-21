@@ -1,6 +1,8 @@
 #pragma once
 
+#include "errors.hpp"
 #include "term_color.hpp"
+#include "utils.hpp"
 
 #define DEFINE_LOGGER(NAME, PRED, COLOR, BASE_LOGGER) \
    template <typename... Ts>             \
@@ -8,7 +10,13 @@
    template <typename... Ts>             \
    inline void NAME(call_info ci, std::string_view f, Ts&&... ts) { if constexpr (PRED) detail::log(BASE_LOGGER, detail::format<COLOR>(f, #NAME, ci), std::forward<Ts>(ts)...); }
 
-namespace bluegrass::feller {
+#define DEFINE_LOGGERS(TAG) \
+   DEFINE_LOGGER(debug_log, is_debug_build, 94, cout_logger<TAG>); \
+   DEFINE_LOGGER(info_log,  true,           92, cout_logger<TAG>); \
+   DEFINE_LOGGER(warn_log,  true,           93, clog_logger<TAG>); \
+   DEFINE_LOGGER(error_log, true,           91, cerr_logger<TAG>); \
+
+namespace bluegrass::cturtle {
    namespace detail {
       struct string_view_wrapper {
          constexpr inline string_view_wrapper(std::string_view t, call_info ci={})
@@ -21,9 +29,21 @@ namespace bluegrass::feller {
          std::string_view value;
          call_info info;
       };
-   } // ns bluegrass::feller::detail
+   } // ns bluegrass::cturtle::detail
 
-   template <typename Stream>
+   /*
+    * Enum to represent the logical output stream "band".
+    */
+   enum class band : uint8_t {
+      debug,
+      message,
+      status,
+      warning,
+      error,
+      fail
+   };
+
+   template <typename Tag, typename Stream>
    struct logger {
       inline logger(Stream& s)
          : stream(&s) {}
@@ -39,9 +59,12 @@ namespace bluegrass::feller {
       Stream* stream;
    };
 
-   inline static logger cout_logger = {std::cout};
-   inline static logger clog_logger = {std::clog};
-   inline static logger cerr_logger = {std::cerr};
+   template <typename Tag>
+   inline static logger cout_logger<Tag> = {std::cout};
+   template <typename Tag>
+   inline static logger clog_logger<Tag> = {std::clog};
+   template <typename Tag>
+   inline static logger cerr_logger<Tag> = {std::cerr};
 
    namespace detail {
       template <typename Logger, typename... Ts>
@@ -54,12 +77,6 @@ namespace bluegrass::feller {
          return fmt::format(form, color::set(FG), nm, color::reset(),
                color::set(color::bright_cyan), ci.file_name(), ci.func_name(), ci.line_num(), color::reset(), f);
       }
-   } // ns bluegrass::feller::detail
+   } // ns bluegrass::cturtle::detail
 
-   DEFINE_LOGGER(debug_log, is_debug_build, 94, cout_logger);
-   DEFINE_LOGGER(info_log,  true,           92, cout_logger);
-   DEFINE_LOGGER(warn_log,  true,           93, clog_logger);
-   DEFINE_LOGGER(error_log, true,           91, cerr_logger);
-} // ns bluegrass::feller
-
-#undef DEFINE_LOGGER
+} // ns bluegrass::cturtle

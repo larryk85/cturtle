@@ -1,5 +1,7 @@
 #pragma once
 
+#include "constants.hpp"
+
 #include <string_view>
 
 #if !defined(LIKELY) && !defined(UNLIKELY)
@@ -17,7 +19,7 @@
 #   endif
 #endif
 
-namespace bluegrass::feller {
+namespace bluegrass::cturtle {
    namespace detail {
       constexpr static inline std::string_view only_file_name(std::string_view f) {
          for (std::size_t i = f.size(); i >= 0; i--)
@@ -38,10 +40,4 @@ namespace bluegrass::feller {
       int line_n;
    };
 
-#ifdef NDEBUG
-   constexpr inline static bool is_debug_build = false;
-#else
-   constexpr inline static bool is_debug_build = true;
-#endif
-
-} // ns bluegrass::feller
+} // ns bluegrass::cturtle

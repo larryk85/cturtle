@@ -7,7 +7,7 @@
 #include <limits>
 #include <stdexcept>
 
-namespace bluegrass::feller {
+namespace bluegrass::cturtle {
    struct error {
       constexpr inline error(std::string_view msg, std::size_t ec)
          : error_msg(msg), error_code(ec) {}
@@ -35,6 +35,6 @@ namespace bluegrass::feller {
          std::string what_msg;
    };
 
-} // ns bluegrass::feller
+} // ns bluegrass::cturtle
 
-#define BLUEGRASS_ERROR(NAME) constexpr static inline bluegrass::feller::error NAME = {#NAME, __COUNTER__};
+#define BLUEGRASS_ERROR(NAME) constexpr static inline bluegrass::cturtle::error NAME = {#NAME, __COUNTER__};

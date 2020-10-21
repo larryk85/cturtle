@@ -15,7 +15,7 @@
 #include <string_view>
 #include <sstream>
 
-namespace bluegrass::feller::color {
+namespace bluegrass::cturtle::color {
 
    namespace style {
       constexpr static inline uint8_t reset     = 0;
@@ -149,4 +149,4 @@ namespace bluegrass::feller::color {
       std::streambuf* clog_old = nullptr;
       std::streambuf* cerr_old = nullptr;
    };
-} // ns bluegrass::feller::color
+} // ns bluegrass::cturtle::color

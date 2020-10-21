@@ -5,7 +5,7 @@
 
 #include <stdexcept>
 
-namespace bluegrass::feller {
+namespace bluegrass::cturtle {
    template <typename... Ts>
    inline void test(bool pred, error err, detail::string_view_wrapper err_msg, Ts&&... ts) {
       if (!UNLIKELY(pred)) {
@@ -17,4 +17,4 @@ namespace bluegrass::feller {
    inline void test(bool pred, error err, call_info ci={}) {
       test(pred, err, {"assertion failure", ci});
    }
-} // ns bluegrass::feller
+} // ns bluegrass::cturtle
