@@ -22,9 +22,31 @@ link_libraries(Threads::Threads)
 include(CMakeDependentOption)
 option(ENABLE_TESTS "enable building of unit tests, spec tests" OFF)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/modules")
+# ##################################################################################################
+# Check submodules and update.
+# ##################################################################################################
+find_package(Git QUIET)
+execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+   RESULT_VARIABLE GIT_SUBMOD_RESULT)
 
-add_subdirectory(external)
+if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+   message(FATAL_ERROR "Failed to update submodules")
+endif()
+
+add_subdirectory(modules/cmake_bits)
+
+# ##################################################################################################
+# Add dependencies.
+# ##################################################################################################
+add_project_dependency(fmt
+   REPO https://github.com/fmtlib/fmt
+   TAG  master
+   DIR  ${CMAKE_BINARY_DIR}
+   ADD_SUBDIR "."
+   SKIP_BUILD
+   ARGS "-DENABLE_TESTS=Off"
+)
 
 add_library(cturtle INTERFACE)
 target_include_directories(cturtle INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -32,11 +54,15 @@ add_library(bluegrass::cturtle ALIAS cturtle)
 target_link_libraries(cturtle INTERFACE fmt::fmt-header-only)
 
 if(ENABLE_TESTS)
+   add_project_dependency(Catch2
+      REPO https://github.com/catchorg/Catch2
+      TAG  devel
+      DIR  ${CMAKE_BINARY_DIR}
+   )
+
    include(CTest)
-   set(CATCH_BUILD_TESTING OFF CACHE BOOL "disable building tests")
-   set(CATCH_INSTALL_DOCS OFF CACHE BOOL "disable installing docs")
-   set(CATCH_INSTALL_HELPERS OFF CACHE BOOL "disable installing helpers")
-   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/Catch2)
-   include(external/Catch2/contrib/Catch.cmake)
+   include(Catch)
+
+   enable_testing()
    add_subdirectory(tests)
 endif()
