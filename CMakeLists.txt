@@ -1,15 +1,17 @@
 cmake_minimum_required(VERSION 3.8)
-set(VERSION_MAJOR 1)
-set(VERSION_MINOR 0)
-set(VERSION_PATCH 0)
-set(VERSION_SUFFIX rc1)
-project(cturtle VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
-if (VERSION_SUFFIX)
-   set(VERSION_FULL "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-${VERSION_SUFFIX}")
-else()
-   set(VERSION_FULL "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
-endif()
+project(cturtle)
+
+add_subdirectory(modules/cmake_bits)
+
+create_version(
+   MAJOR 1
+   MINOR 0
+   PATCH 0
+   SUFF  alpha
+)
+
+message( STATUS "Building cturtle v${cturtle_VERSION}..." )
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS ON)
@@ -20,21 +22,8 @@ find_package(Threads)
 link_libraries(Threads::Threads)
 
 include(CMakeDependentOption)
-option(ENABLE_TESTS "enable building of unit tests, spec tests" OFF)
-
-# ##################################################################################################
-# Check submodules and update.
-# ##################################################################################################
-find_package(Git QUIET)
-execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
-   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-   RESULT_VARIABLE GIT_SUBMOD_RESULT)
-
-if(NOT GIT_SUBMOD_RESULT EQUAL "0")
-   message(FATAL_ERROR "Failed to update submodules")
-endif()
-
-add_subdirectory(modules/cmake_bits)
+option(ENABLE_INSTALL "enable installation" ON)
+option(ENABLE_TESTS "enable building of unit tests" OFF)
 
 # ##################################################################################################
 # Add dependencies.
@@ -49,20 +38,68 @@ add_project_dependency(fmt
 )
 
 add_library(cturtle INTERFACE)
-target_include_directories(cturtle INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(cturtle INTERFACE
+   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+   $<INSTALL_INTERFACE:include>)
 add_library(bluegrass::cturtle ALIAS cturtle)
 target_link_libraries(cturtle INTERFACE fmt::fmt-header-only)
 
-if(ENABLE_TESTS)
-   add_project_dependency(Catch2
-      REPO https://github.com/catchorg/Catch2
-      TAG  devel
-      DIR  ${CMAKE_BINARY_DIR}
+#if(ENABLE_TESTS)
+#   add_project_dependency(Catch2
+#      REPO https://github.com/catchorg/Catch2
+#      TAG  devel
+#      DIR  ${CMAKE_BINARY_DIR}
+#   )
+#
+#   include(CTest)
+#   include(Catch)
+#
+#   enable_testing()
+#   add_subdirectory(tests)
+#endif()
+
+# ##################################################################################################
+# Configure version info.
+# ##################################################################################################
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/modules/cturtle-config-version.cmake.in
+               ${CMAKE_CURRENT_BINARY_DIR}/cturtle-config-version.cmake @ONLY)
+
+# ##################################################################################################
+# Installation.
+# ##################################################################################################
+if(ENABLE_INSTALL)
+   include(CMakePackageConfigHelpers)
+   include(GNUInstallDirs)
+
+   message(STATUS "Installing bluegrass cturtle ...")
+   set(cturtle_INCLUDE_DIRS ${CMAKE_INSTALL_INCLUDEDIR})
+   configure_package_config_file(modules/cturtle-config.cmake.in
+      ${CMAKE_CURRENT_BINARY_DIR}/cturtle-config.cmake
+      INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cturtle
+      PATH_VARS cturtle_INCLUDE_DIRS
+   )
+   write_basic_package_version_file(
+      ${CMAKE_CURRENT_BINARY_DIR}/cturtle-config-version.cmake
+      VERSION ${cturtle_VERSION}
+      COMPATIBILITY SameMajorVersion
    )
 
-   include(CTest)
-   include(Catch)
-
-   enable_testing()
-   add_subdirectory(tests)
+   install(TARGETS cturtle fmt::fmt-header-only
+           EXPORT cturtle-targets
+           LIBRARY
+           PUBLIC_HEADER
+              DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+              COMPONENT Headers
+   )
+   install(EXPORT cturtle-targets
+      NAMESPACE bluegrass::
+      DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cturtle
+   )
+   install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/bluegrass
+           DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+   )
+   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cturtle-config.cmake
+                 ${CMAKE_CURRENT_BINARY_DIR}/cturtle-config-version.cmake
+                 DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cturtle
+   )
 endif()

@@ -1,0 +1,13 @@
+set(PROJ @CMAKE_PROJECT_NAME@)
+set(@PROJ@_VERSION x.y.z)
+
+@PACKAGE_INIT@
+
+set_and_check(@PROJ@_INCLUDE_DIRS "@PACKAGE_cturtle_INCLUDE_DIRS@")
+check_required_components(@PROJ@)
+
+get_filename_component(_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+file(GLOB CONFIG_FILES "${_DIR}/cturtle-targets.cmake")
+foreach(f ${CONFIG_FILES})
+  include(${f})
+endforeach()
