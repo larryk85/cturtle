@@ -45,7 +45,7 @@ namespace bluegrass::cturtle {
 
    template <typename Tag, typename Stream>
    struct logger {
-      inline logger(Stream& s)
+      inline logger(Tag, Stream& s)
          : stream(&s) {}
 
       template <typename... Ts>
@@ -59,12 +59,13 @@ namespace bluegrass::cturtle {
       Stream* stream;
    };
 
-   template <typename Tag>
-   inline static logger<Tag> cout_logger = {std::cout};
-   template <typename Tag>
-   inline static logger<Tag> clog_logger = {std::clog};
-   template <typename Tag>
-   inline static logger<Tag> cerr_logger = {std::cerr};
+   struct stdout_tag{};
+   struct stdlog_tag{};
+   struct stderr_tag{};
+
+   inline static logger cout_logger = {stdout_tag{}, std::cout};
+   inline static logger clog_logger = {stdlog_tag{}, std::clog};
+   inline static logger cerr_logger = {stderr_tag{}, std::cerr};
 
    namespace detail {
       template <typename Logger, typename... Ts>
