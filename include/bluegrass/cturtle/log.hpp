@@ -10,12 +10,6 @@
    template <typename... Ts>             \
    inline void NAME(call_info ci, std::string_view f, Ts&&... ts) { if constexpr (PRED) detail::log(BASE_LOGGER, detail::format<COLOR>(f, #NAME, ci), std::forward<Ts>(ts)...); }
 
-#define DEFINE_LOGGERS(TAG) \
-   DEFINE_LOGGER(debug_log, is_debug_build, 94, cout_logger<TAG>); \
-   DEFINE_LOGGER(info_log,  true,           92, cout_logger<TAG>); \
-   DEFINE_LOGGER(warn_log,  true,           93, clog_logger<TAG>); \
-   DEFINE_LOGGER(error_log, true,           91, cerr_logger<TAG>); \
-
 namespace bluegrass::cturtle {
    namespace detail {
       struct string_view_wrapper {
@@ -80,4 +74,17 @@ namespace bluegrass::cturtle {
       }
    } // ns bluegrass::cturtle::detail
 
+   constexpr static inline uint8_t bright_red        = 91;
+   constexpr static inline uint8_t bright_green      = 92;
+   constexpr static inline uint8_t bright_yellow     = 93;
+   constexpr static inline uint8_t bright_blue       = 94;
+   constexpr static inline uint8_t bright_magenta    = 95;
+   constexpr static inline uint8_t bright_cyan       = 96;
+   constexpr static inline uint8_t bright_gray       = 97;
+   constexpr static inline uint8_t bg_black          = 40;
+
+   DEFINE_LOGGER(debug_log, is_debug_build, bright_blue, cout_logger);
+   DEFINE_LOGGER(info_log, true, bright_green, cout_logger);
+   DEFINE_LOGGER(warn_log, true, bright_yellow, clog_logger);
+   DEFINE_LOGGER(error_log, true, bright_red, cerr_logger);
 } // ns bluegrass::cturtle
