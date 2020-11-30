@@ -32,7 +32,6 @@ add_project_dependency(fmt
    REPO https://github.com/fmtlib/fmt
    TAG  master
    DIR  ${CMAKE_BINARY_DIR}
-   ADD_SUBDIR "."
    SKIP_BUILD
    ARGS "-DENABLE_TESTS=Off"
 )
@@ -42,7 +41,7 @@ target_include_directories(cturtle INTERFACE
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
    $<INSTALL_INTERFACE:include>)
 add_library(bluegrass::cturtle ALIAS cturtle)
-target_link_libraries(cturtle INTERFACE fmt::fmt-header-only)
+target_link_libraries(cturtle INTERFACE fmt)
 
 #if(ENABLE_TESTS)
 #   add_project_dependency(Catch2
@@ -84,7 +83,7 @@ if(ENABLE_INSTALL)
       COMPATIBILITY SameMajorVersion
    )
 
-   install(TARGETS cturtle fmt-header-only
+   install(TARGETS cturtle
            EXPORT cturtle-targets
            LIBRARY
            PUBLIC_HEADER
