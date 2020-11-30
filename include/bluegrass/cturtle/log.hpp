@@ -60,11 +60,11 @@ namespace bluegrass::cturtle {
    };
 
    template <typename Tag>
-   inline static logger cout_logger<Tag> = {std::cout};
+   inline static logger<Tag> cout_logger = {std::cout};
    template <typename Tag>
-   inline static logger clog_logger<Tag> = {std::clog};
+   inline static logger<Tag> clog_logger = {std::clog};
    template <typename Tag>
-   inline static logger cerr_logger<Tag> = {std::cerr};
+   inline static logger<Tag> cerr_logger = {std::cerr};
 
    namespace detail {
       template <typename Logger, typename... Ts>
