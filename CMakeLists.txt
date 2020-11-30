@@ -23,7 +23,7 @@ link_libraries(Threads::Threads)
 
 include(CMakeDependentOption)
 option(ENABLE_INSTALL "enable installation" ON)
-option(ENABLE_TESTS "enable building of unit tests" OFF)
+option(ENABLE_TESTS "enable building of unit tests" ON)
 
 # ##################################################################################################
 # Add dependencies.
@@ -84,7 +84,7 @@ if(ENABLE_INSTALL)
       COMPATIBILITY SameMajorVersion
    )
 
-   install(TARGETS cturtle fmt::fmt-header-only
+   install(TARGETS cturtle fmt-header-only
            EXPORT cturtle-targets
            LIBRARY
            PUBLIC_HEADER
