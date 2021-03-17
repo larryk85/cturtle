@@ -49,7 +49,6 @@ if(ENABLE_TESTS)
    FetchContent_GetProperties(Catch2)
    if (NOT Catch2_POPULATED)
       FetchContent_MakeAvailable(Catch2)
-      message(STATUS "CSD ${catch2_SOURCE_DIR}")
       list(APPEND CMAKE_MODULE_PATH "${catch2_SOURCE_DIR}/contrib") 
    endif()
 
