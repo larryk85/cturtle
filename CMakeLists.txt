@@ -1,15 +1,6 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.14)
 
-project(cturtle)
-
-add_subdirectory(modules/cmake_bits)
-
-create_version(
-   MAJOR 1
-   MINOR 0
-   PATCH 0
-   SUFF  alpha
-)
+project(cturtle VERSION 1.0.0.0)
 
 message( STATUS "Building cturtle v${cturtle_VERSION}..." )
 
@@ -25,37 +16,49 @@ include(CMakeDependentOption)
 option(ENABLE_INSTALL "enable installation" ON)
 option(ENABLE_TESTS "enable building of unit tests" ON)
 
+include(FetchContent)
 # ##################################################################################################
 # Add dependencies.
 # ##################################################################################################
-add_project_dependency(fmt
-   REPO https://github.com/fmtlib/fmt
-   TAG  master
-   DIR  ${CMAKE_BINARY_DIR}
-   SKIP_BUILD
-   ARGS "-DENABLE_TESTS=Off"
+FetchContent_Declare(
+   fmt
+   GIT_REPOSITORY https://github.com/fmtlib/fmt
+   GIT_TAG master
 )
+
+FetchContent_GetProperties(fmt)
+if (NOT fmt_POPULATED)
+   set(FMT_INSTALL ON)
+   FetchContent_MakeAvailable(fmt)
+endif()
 
 add_library(cturtle INTERFACE)
 target_include_directories(cturtle INTERFACE
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
    $<INSTALL_INTERFACE:include>)
 add_library(bluegrass::cturtle ALIAS cturtle)
-target_link_libraries(cturtle INTERFACE fmt)
+target_link_libraries(cturtle INTERFACE fmt::fmt-header-only)
 
-#if(ENABLE_TESTS)
-#   add_project_dependency(Catch2
-#      REPO https://github.com/catchorg/Catch2
-#      TAG  devel
-#      DIR  ${CMAKE_BINARY_DIR}
-#   )
-#
-#   include(CTest)
-#   include(Catch)
-#
-#   enable_testing()
-#   add_subdirectory(tests)
-#endif()
+if(ENABLE_TESTS)
+   FetchContent_Declare(
+      Catch2
+      GIT_REPOSITORY https://github.com/catchorg/Catch2
+      GIT_TAG v2.13.4
+   )
+   
+   FetchContent_GetProperties(Catch2)
+   if (NOT Catch2_POPULATED)
+      FetchContent_MakeAvailable(Catch2)
+      message(STATUS "CSD ${catch2_SOURCE_DIR}")
+      list(APPEND CMAKE_MODULE_PATH "${catch2_SOURCE_DIR}/contrib") 
+   endif()
+
+   include(CTest)
+   include(Catch)
+
+   enable_testing()
+   add_subdirectory(tests)
+endif()
 
 # ##################################################################################################
 # Configure version info.
