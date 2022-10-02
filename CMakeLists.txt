@@ -14,7 +14,7 @@ link_libraries(Threads::Threads)
 
 include(CMakeDependentOption)
 option(ENABLE_INSTALL "enable installation" ON)
-option(ENABLE_TESTS "enable building of unit tests" ON)
+option(ENABLE_TESTS "enable building of unit tests" OFF)
 
 include(FetchContent)
 # ##################################################################################################
@@ -43,7 +43,7 @@ if(ENABLE_TESTS)
    FetchContent_Declare(
       Catch2
       GIT_REPOSITORY https://github.com/catchorg/Catch2
-      GIT_TAG v2.13.4
+      GIT_TAG devel
    )
    
    FetchContent_GetProperties(Catch2)
