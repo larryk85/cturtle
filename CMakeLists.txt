@@ -16,32 +16,32 @@ include(CMakeDependentOption)
 option(CTURTLE_ENABLE_INSTALL "enable installation" ON)
 option(CTURTLE_ENABLE_TESTS "enable building of unit tests" OFF)
 
-find_package(fmt REQUIRED)
+#find_package(fmt REQUIRED)
 
-if (NOT fmt_FOUND)
-   include(FetchContent)
-   # ##################################################################################################
-   # Add dependencies.
-   # ##################################################################################################
-   FetchContent_Declare(
-      fmt
-      GIT_REPOSITORY https://github.com/fmtlib/fmt
-      GIT_TAG master
-   )
-
-   FetchContent_GetProperties(fmt)
-   if (NOT fmt_POPULATED)
-      set(FMT_INSTALL ON)
-      FetchContent_MakeAvailable(fmt)
-   endif()
-endif()
+#if (NOT fmt_FOUND)
+#   include(FetchContent)
+#   # ##################################################################################################
+#   # Add dependencies.
+#   # ##################################################################################################
+#   FetchContent_Declare(
+#      fmt
+#      GIT_REPOSITORY https://github.com/fmtlib/fmt
+#      GIT_TAG master
+#   )
+#
+#   FetchContent_GetProperties(fmt)
+#   if (NOT fmt_POPULATED)
+#      set(FMT_INSTALL ON)
+#      FetchContent_MakeAvailable(fmt)
+#   endif()
+#endif()
 
 add_library(cturtle INTERFACE)
 target_include_directories(cturtle INTERFACE
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
    $<INSTALL_INTERFACE:include>)
 add_library(bluegrass::cturtle ALIAS cturtle)
-target_link_libraries(cturtle INTERFACE fmt::fmt-header-only)
+target_link_libraries(cturtle INTERFACE fmt::fmt)
 
 if(ENABLE_TESTS)
    FetchContent_Declare(
