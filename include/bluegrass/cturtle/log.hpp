@@ -43,7 +43,7 @@ namespace bluegrass::cturtle {
          : stream(&s) {}
 
       template <typename... Ts>
-      void write(std::string_view format, Ts&&... ts) {
+      void write(const std::string& format, Ts&&... ts) {
          (*stream) << fmt::format(format, std::forward<Ts>(ts)...);
          flush();
       }
