@@ -7,7 +7,7 @@
 
 namespace bluegrass::cturtle {
    template <typename... Ts>
-   inline void test(bool pred, error err, detail::string_view_wrapper err_msg, Ts&&... ts) {
+   inline void test(bool pred, error err, detail::string_wrapper err_msg, Ts&&... ts) {
       if (!UNLIKELY(pred)) {
          error_log(err_msg.info, err_msg.value, std::forward<Ts>(ts)...);
          throw runtime_error(err);

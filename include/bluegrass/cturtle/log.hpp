@@ -6,21 +6,21 @@
 
 #define DEFINE_LOGGER(NAME, PRED, COLOR, BASE_LOGGER) \
    template <typename... Ts>             \
-   inline void NAME(detail::string_view_wrapper f, Ts&&... ts) { if constexpr (PRED) detail::log(BASE_LOGGER, detail::format<COLOR>(f.value, #NAME, f.info), std::forward<Ts>(ts)...); } \
+   inline void NAME(detail::string_wrapper f, Ts&&... ts) { if constexpr (PRED) detail::log(BASE_LOGGER, detail::format<COLOR>(f.value, #NAME, f.info), std::forward<Ts>(ts)...); } \
    template <typename... Ts>             \
-   inline void NAME(call_info ci, std::string_view f, Ts&&... ts) { if constexpr (PRED) detail::log(BASE_LOGGER, detail::format<COLOR>(f, #NAME, ci), std::forward<Ts>(ts)...); }
+   inline void NAME(call_info ci, const std::string& f, Ts&&... ts) { if constexpr (PRED) detail::log(BASE_LOGGER, detail::format<COLOR>(f, #NAME, ci), std::forward<Ts>(ts)...); }
 
 namespace bluegrass::cturtle {
    namespace detail {
-      struct string_view_wrapper {
-         constexpr inline string_view_wrapper(std::string_view t, call_info ci={})
-            : value(t), info(ci) {}
+      struct string_wrapper {
+         inline string_wrapper(std::string t, call_info ci={})
+            : value(std::move(t)), info(ci) {}
          template <std::size_t N>
-         constexpr inline string_view_wrapper(const char (&s)[N], call_info ci={})
-           : value(s), info(ci) {}
-         constexpr inline operator std::string_view() const { return value; }
+         constexpr inline string_wrapper(const char (&s)[N], call_info ci={})
+           : value(s, N), info(ci) {}
+         constexpr inline operator const std::string&() const { return value; }
 
-         std::string_view value;
+         std::string value;
          call_info info;
       };
    } // ns bluegrass::cturtle::detail
@@ -63,14 +63,14 @@ namespace bluegrass::cturtle {
 
    namespace detail {
       template <typename Logger, typename... Ts>
-      inline void log(Logger& l, std::string_view f, Ts&&... ts) {
+      inline void log(Logger& l, const std::string& f, Ts&&... ts) {
          l.write(f, std::forward<Ts>(ts)...);
       }
       template <uint8_t FG>
-      inline auto format(std::string_view f, std::string_view nm, call_info ci) {
-         constexpr std::string_view form = "{0}[{1}]{2} :: {3}{4}:{5}:{6}{7} :: {8}\n";
+      inline auto format(const std::string& f, const std::string& nm, call_info ci) {
+         static const std::string& form = "{0}[{1}]{2} :: {3}{4}:{5}:{6}{7} :: {8}\n";
          return fmt::format(form, color::set(FG), nm, color::reset(),
-               color::set(color::bright_cyan), ci.file_name(), ci.func_name(), ci.line_num(), color::reset(), f);
+               color::set(color::bright_cyan), std::string(ci.file_name()), std::string(ci.func_name()), ci.line_num(), color::reset(), f);
       }
    } // ns bluegrass::cturtle::detail
 
