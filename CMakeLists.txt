@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.10)
 
 project(cturtle VERSION 1.0.0.0)
 
@@ -13,23 +13,27 @@ find_package(Threads)
 link_libraries(Threads::Threads)
 
 include(CMakeDependentOption)
-option(ENABLE_INSTALL "enable installation" ON)
-option(ENABLE_TESTS "enable building of unit tests" OFF)
+option(CTURTLE_ENABLE_INSTALL "enable installation" ON)
+option(CTURTLE_ENABLE_TESTS "enable building of unit tests" OFF)
 
-include(FetchContent)
-# ##################################################################################################
-# Add dependencies.
-# ##################################################################################################
-FetchContent_Declare(
-   fmt
-   GIT_REPOSITORY https://github.com/fmtlib/fmt
-   GIT_TAG master
-)
+find_package(fmt REQUIRED)
 
-FetchContent_GetProperties(fmt)
-if (NOT fmt_POPULATED)
-   set(FMT_INSTALL ON)
-   FetchContent_MakeAvailable(fmt)
+if (NOT fmt_FOUND)
+   include(FetchContent)
+   # ##################################################################################################
+   # Add dependencies.
+   # ##################################################################################################
+   FetchContent_Declare(
+      fmt
+      GIT_REPOSITORY https://github.com/fmtlib/fmt
+      GIT_TAG master
+   )
+
+   FetchContent_GetProperties(fmt)
+   if (NOT fmt_POPULATED)
+      set(FMT_INSTALL ON)
+      FetchContent_MakeAvailable(fmt)
+   endif()
 endif()
 
 add_library(cturtle INTERFACE)
