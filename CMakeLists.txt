@@ -41,7 +41,7 @@ target_include_directories(cturtle INTERFACE
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
    $<INSTALL_INTERFACE:include>)
 add_library(bluegrass::cturtle ALIAS cturtle)
-target_link_libraries(cturtle INTERFACE fmt::fmt-header-only)
+target_link_libraries(cturtle INTERFACE fmt::fmt)
 
 if(ENABLE_TESTS)
    FetchContent_Declare(
