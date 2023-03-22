@@ -68,9 +68,14 @@ namespace bluegrass::cturtle {
       }
       template <uint8_t FG>
       inline auto format(std::string_view f, std::string_view nm, call_info ci) {
-         constexpr std::string_view form = "{0}[{1}]{2} :: {3}{4}:{5}:{6}{7} :: {8}\n";
-         return fmt::format(form, color::set(FG), nm, color::reset(),
-               color::set(color::bright_cyan), ci.file_name(), ci.func_name(), ci.line_num(), color::reset(), f);
+         if constexpr (is_debug_build) {
+            constexpr std::string_view form = "{0}[{1}]{2} :: {3}{4}:{5}:{6}{7} :: {8}\n";
+            return fmt::format(form, color::set(FG), nm, color::reset(),
+                  color::set(color::bright_cyan), ci.file_name(), ci.func_name(), ci.line_num(), color::reset(), f);
+         } else {
+            constexpr std::string_view form = "{0}[{1}]{2} :: {3}\n";
+            return fmt::format(form, color::set(FG), nm, color::reset(), f);
+         }
       }
    } // ns bluegrass::cturtle::detail
 
